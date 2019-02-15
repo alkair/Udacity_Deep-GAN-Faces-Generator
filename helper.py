@@ -217,6 +217,51 @@ class Dataset(object):
             current_index += batch_size
 
             yield data_batch / IMAGE_MAX_VALUE - 0.5
+            
+class Dataset64(object):
+    """
+    Dataset
+    """
+    def __init__(self, dataset_name, data_files):
+        """
+        Initalize the class
+        :param dataset_name: Database name
+        :param data_files: List of files in the database
+        """
+        DATASET_CELEBA_NAME = 'celeba'
+        DATASET_MNIST_NAME = 'mnist'
+        IMAGE_WIDTH = 64
+        IMAGE_HEIGHT = 64
+
+        if dataset_name == DATASET_CELEBA_NAME:
+            self.image_mode = 'RGB'
+            image_channels = 3
+
+        elif dataset_name == DATASET_MNIST_NAME:
+            self.image_mode = 'L'
+            image_channels = 1
+
+        self.data_files = data_files
+        self.shape = len(data_files), IMAGE_WIDTH, IMAGE_HEIGHT, image_channels
+
+    def get_batches(self, batch_size):
+        """
+        Generate batches
+        :param batch_size: Batch Size
+        :return: Batches of data
+        """
+        IMAGE_MAX_VALUE = 255
+
+        current_index = 0
+        while current_index + batch_size <= self.shape[0]:
+            data_batch = get_batch(
+                self.data_files[current_index:current_index + batch_size],
+                *self.shape[1:3],
+                self.image_mode)
+
+            current_index += batch_size
+
+            yield data_batch / IMAGE_MAX_VALUE - 0.5
 
 
 class DLProgress(tqdm):
